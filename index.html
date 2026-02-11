@@ -3,123 +3,133 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Leadership Archetype Diagnostic</title>
+    <title>ENTJ Leadership Audit | Randomizing Engine</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        .choice-btn { border: 2px solid #e2e8f0; transition: all 0.2s ease; }
-        .active-agree { background-color: #4f46e5 !important; color: white !important; border-color: #4f46e5 !important; }
-        .active-disagree { background-color: #10b981 !important; color: white !important; border-color: #10b981 !important; }
-        .active-both { background-color: #f59e0b !important; color: white !important; border-color: #f59e0b !important; }
+        .choice-btn { border: 2px solid #e2e8f0; transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); }
+        .active-agree { background-color: #4338ca !important; color: white !important; border-color: #4338ca !important; transform: translateY(-2px); box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); }
+        .active-disagree { background-color: #059669 !important; color: white !important; border-color: #059669 !important; transform: translateY(-2px); box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); }
+        .active-both { background-color: #d97706 !important; color: white !important; border-color: #d97706 !important; transform: translateY(-2px); box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); }
+        .card-enter { animation: slideUp 0.5s ease-out forwards; opacity: 0; }
+        @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
     </style>
 </head>
-<body class="bg-slate-50 text-slate-900 font-sans">
+<body class="bg-slate-50 text-slate-900 font-sans selection:bg-indigo-100">
 
-    <div class="max-w-4xl mx-auto py-12 px-6">
-        <header class="text-center mb-16">
-            <h1 class="text-4xl font-black uppercase italic tracking-tighter">The Commander's Diagnostic</h1>
-            <p class="text-slate-500 mt-2 font-medium">30-Point Situational Assessment</p>
-            <div id="progress-text" class="mt-4 text-xs font-bold text-indigo-600 uppercase tracking-widest">0 / 30 Completed</div>
+    <div class="max-w-4xl mx-auto py-16 px-6">
+        <header class="text-center mb-12">
+            <span class="text-indigo-600 font-black tracking-widest uppercase text-xs">Advanced Management Diagnostic</span>
+            <h1 class="text-5xl font-black uppercase italic tracking-tighter mt-2">The Commander's Audit</h1>
+            <div class="flex justify-center gap-4 mt-6">
+                <div class="h-1 w-12 bg-indigo-600 rounded-full"></div>
+                <div class="h-1 w-12 bg-amber-500 rounded-full"></div>
+                <div class="h-1 w-12 bg-emerald-500 rounded-full"></div>
+            </div>
+            <p id="progress-text" class="mt-8 text-sm font-bold text-slate-400 uppercase">0 of 30 Scenarios Evaluated</p>
         </header>
 
-        <div id="quiz-container" class="space-y-4">
+        <div id="quiz-container" class="space-y-6">
             </div>
 
-        <div class="mt-16 mb-32 text-center">
-            <button onclick="calculateResults()" class="bg-slate-900 text-white px-12 py-5 rounded-full font-black text-xl shadow-2xl hover:scale-105 transition-transform uppercase italic tracking-widest">
-                Generate My Profile
+        <div class="mt-20 mb-40 text-center">
+            <button onclick="calculateResults()" class="bg-slate-900 text-white px-16 py-6 rounded-2xl font-black text-2xl shadow-2xl hover:bg-black transition-all hover:scale-105 active:scale-95 uppercase italic tracking-widest">
+                Finalize Profile
             </button>
         </div>
     </div>
 
-    <div id="result-modal" class="hidden fixed inset-0 bg-slate-900/95 backdrop-blur-xl z-50 flex items-center justify-center p-4">
-        <div class="bg-white max-w-4xl w-full max-h-[90vh] overflow-y-auto rounded-[2rem] p-10 shadow-2xl">
-            <div class="flex justify-between items-center mb-10 border-b pb-6">
-                <div>
-                    <h2 class="text-3xl font-black uppercase italic">Assessment Results</h2>
-                    <p id="archetype-title" class="text-indigo-600 font-bold uppercase tracking-widest mt-1"></p>
-                </div>
-                <button onclick="closeModal()" class="text-slate-400 text-4xl">&times;</button>
+    <div id="result-modal" class="hidden fixed inset-0 bg-slate-900/90 backdrop-blur-xl z-50 flex items-center justify-center p-4">
+        <div class="bg-white max-w-4xl w-full max-h-[95vh] overflow-y-auto rounded-[3rem] p-12 shadow-2xl relative">
+            <button onclick="closeModal()" class="absolute top-8 right-8 text-slate-300 hover:text-slate-900 text-5xl font-light">&times;</button>
+            
+            <div class="mb-12">
+                <h2 class="text-5xl font-black uppercase italic tracking-tighter leading-none" id="archetype-title">Analyzing...</h2>
+                <p class="text-indigo-600 font-bold uppercase tracking-widest mt-4">Psychometric Leadership Breakdown</p>
             </div>
             
-            <div class="grid lg:grid-cols-2 gap-12 mb-10">
-                <div class="h-64">
+            <div class="grid lg:grid-cols-2 gap-16 mb-12 items-center">
+                <div class="relative">
                     <canvas id="resultChart"></canvas>
+                    <div class="absolute inset-0 flex items-center justify-center -z-10">
+                        <div class="w-32 h-32 bg-slate-50 rounded-full"></div>
+                    </div>
                 </div>
-                <div class="flex flex-col justify-center bg-slate-50 p-6 rounded-2xl">
-                    <h4 class="font-bold text-slate-400 uppercase text-xs mb-4">Core Analysis</h4>
-                    <p id="verdict-text" class="text-slate-700 leading-relaxed font-medium"></p>
-                </div>
-            </div>
-
-            <div class="grid grid-cols-3 gap-4 mb-10 text-center">
-                <div class="p-4 bg-indigo-50 rounded-2xl border-b-4 border-indigo-400">
-                    <span class="block text-[10px] font-bold text-indigo-400 uppercase">Strategy Alignment</span>
-                    <span id="strat-score" class="text-2xl font-black text-indigo-700">0</span>
-                </div>
-                <div class="p-4 bg-amber-50 rounded-2xl border-b-4 border-amber-400">
-                    <span class="block text-[10px] font-bold text-amber-400 uppercase">Hybrid Balance</span>
-                    <span id="both-score" class="text-2xl font-black text-amber-700">0</span>
-                </div>
-                <div class="p-4 bg-emerald-50 rounded-2xl border-b-4 border-emerald-400">
-                    <span class="block text-[10px] font-bold text-emerald-400 uppercase">Delivery Alignment</span>
-                    <span id="deliv-score" class="text-2xl font-black text-emerald-700">0</span>
+                <div class="space-y-6">
+                    <div class="bg-slate-50 p-8 rounded-3xl border border-slate-100">
+                        <h4 class="text-xs font-black text-slate-400 uppercase tracking-widest mb-4">Strategic Verdict</h4>
+                        <p id="verdict-text" class="text-xl font-medium text-slate-800 leading-relaxed"></p>
+                    </div>
+                    <div class="grid grid-cols-3 gap-2">
+                        <div class="text-center p-4 bg-indigo-50 rounded-2xl"><span class="block text-[10px] font-bold text-indigo-400 uppercase">Strategy</span><span id="s-val" class="text-2xl font-black text-indigo-700">0</span></div>
+                        <div class="text-center p-4 bg-amber-50 rounded-2xl"><span class="block text-[10px] font-bold text-amber-400 uppercase">Hybrid</span><span id="h-val" class="text-2xl font-black text-amber-700">0</span></div>
+                        <div class="text-center p-4 bg-emerald-50 rounded-2xl"><span class="block text-[10px] font-bold text-emerald-400 uppercase">Delivery</span><span id="d-val" class="text-2xl font-black text-emerald-700">0</span></div>
+                    </div>
                 </div>
             </div>
 
-            <div class="bg-indigo-900 text-white p-8 rounded-3xl">
-                <h4 class="font-black uppercase tracking-tighter text-indigo-300 mb-2 italic text-lg">ENTJ Career Roadmap</h4>
-                <p id="career-advice" class="text-indigo-100"></p>
+            <div class="bg-indigo-600 text-white p-10 rounded-[2rem] shadow-xl">
+                <h4 class="font-black uppercase tracking-tighter text-indigo-200 mb-4 italic text-xl">The ENTJ Roadmap</h4>
+                <p id="career-advice" class="text-lg opacity-90 leading-relaxed"></p>
             </div>
         </div>
     </div>
 
     <script>
-        const questions = [
-            { id: 1, text: "I prefer defining a brand new goal over building a plan for an existing one." },
-            { id: 2, text: "I’d rather look at 3-year market projections than weekly sprint reports." },
-            { id: 3, text: "I find outdated business models more frustrating than technical bottlenecks." },
-            { id: 4, text: "I want to be held accountable for Market Share rather than a specific Launch Date." },
-            { id: 5, text: "In a crisis, I instinctively re-evaluate the goal instead of increasing speed." },
-            { id: 6, text: "I enjoy Resource Allocation (deciding budgets) more than Resource Management (tracking)." },
-            { id: 7, text: "I use my directness to challenge assumptions rather than enforce standards." },
-            { id: 8, text: "I'd rather be the Architect who leaves after plans are done than the Builder." },
-            { id: 9, text: "I prefer spending time with external partners/clients than with the internal team." },
-            { id: 10, text: "I would rather solve a problem of 'Growth' than a problem of 'Efficiency'." },
-            { id: 11, text: "I prefer high-level C-suite politics over the daily politics of team morale." },
-            { id: 12, text: "I find it more rewarding to secure a budget than to successfully spend it." },
-            { id: 13, text: "I am comfortable making a major pivot with only 70% of the data available." },
-            { id: 14, text: "I'd rather tell a CEO their vision is wrong than tell a Developer their code is late." },
-            { id: 15, text: "I prefer 'Blue Ocean' ambiguity over 'War Room' intensity." },
-            { id: 16, text: "I value Innovation significantly more than Consistency." },
-            { id: 17, text: "I prefer looking at Leading Indicators (future) over Lagging Indicators (past)." },
-            { id: 18, text: "I'd rather sacrifice team harmony for a Strategic Win than for a Project Deadline." },
-            { id: 19, text: "I enjoy Competitive Analysis more than Internal Benchmarking." },
-            { id: 20, text: "I prefer being a Subject Matter Expert (SME) over being a Process Owner." },
-            { id: 21, text: "I want my legacy to be 'They changed our direction' rather than 'They were on time'." },
-            { id: 22, text: "I find mundane status-tracking more draining than abstract problem-solving." },
-            { id: 23, text: "I prefer 'Selling' a vision to stakeholders over 'Protecting' a team from them." },
-            { id: 24, text: "I would rather attend a Market Trend conference than an Agile/Ops workshop." },
-            { id: 25, text: "I prefer to work on a 50-page business case over a 50-item task list." },
-            { id: 26, text: "I enjoy the challenge of 'M&A' more than 'Hiring'." },
-            { id: 27, text: "I'd rather be remembered as 'Visionary' than 'Reliable'." },
-            { id: 28, text: "I prefer to manage the 'Why' of a product rather than the 'When'." },
-            { id: 29, text: "I am energized by convincing skeptics of a new, unproven direction." },
-            { id: 30, text: "I prefer to act as a 'Consultant' rather than a 'Foreman'." }
+        const rawQuestions = [
+            { text: "I prefer setting the 'North Star' for a company over building the roadmap to get there." },
+            { text: "I find it more stressful to have a 'wrong' strategy than to have a 'late' delivery." },
+            { text: "I get more energy from high-level brainstorming than tactical stand-ups." },
+            { text: "I'd rather be responsible for 'Product Viability' than 'Product Stability'." },
+            { text: "I prefer managing a portfolio of 10 projects over the details of a single one." },
+            { text: "I believe 'Culture' is a more important lever for success than 'Process'." },
+            { text: "I enjoy the political work of securing buy-in more than the technical work of execution." },
+            { text: "I would rather hire a 'Visionary' who is messy than an 'Optimizer' who is rigid." },
+            { text: "I find predictability in a team slightly boring; I prefer 'Pivot-ability'." },
+            { text: "I am more interested in Industry Trends than Internal Team Velocity." },
+            { text: "I'd rather present a pitch deck to an investor than a status report to a client." },
+            { text: "I feel most useful removing 'Structural' barriers, not 'Technical' ones." },
+            { text: "I prefer to work on 'High-Risk/High-Reward' bets over safe increments." },
+            { text: "I would rather define the 'Budget Pillars' than track the 'Daily Burn Rate'." },
+            { text: "I am okay with a team being uncomfortable if it means we are innovating." },
+            { text: "I prefer to spend time with 'Thought Leaders' rather than 'Subject Matter Experts'." },
+            { text: "I would rather write a 'Vision Document' than a 'Functional Specification'." },
+            { text: "I find 'Market Saturation' more alarming than 'Team Attrition'." },
+            { text: "I get more satisfaction from 'Signing a Partner' than 'Closing a Ticket'." },
+            { text: "I prefer to delegate implementation so I can focus on implications." },
+            { text: "I value flexibility in a contract more than fixed-price certainty." },
+            { text: "I’d rather be the 'Face' of a transformation than the 'Engine' behind it." },
+            { text: "I prefer solving 'Customer Perception' issues over 'System Performance' issues." },
+            { text: "I find 'Repeating a Success' less interesting than 'Attempting a Breakthrough'." },
+            { text: "I would rather manage a team of 'Specialists' than a team of 'Generalists'." },
+            { text: "I believe my best work happens in the Boardroom, not the War Room." },
+            { text: "I’d rather lose a 'Battle' (milestone) if it helps me win the 'War' (market)." },
+            { text: "I find Standard Operating Procedures (SOPs) to be a constraint on my leadership." },
+            { text: "I prefer qualitative feedback (interviews) over quantitative data (metrics)." },
+            { text: "I would rather be the Navigator on the bridge than the Engineer in the engine room." }
         ];
+
+        // Randomization Logic
+        const questions = rawQuestions
+            .map((q, i) => ({ ...q, id: i }))
+            .sort(() => Math.random() - 0.5);
 
         const state = {};
         const container = document.getElementById('quiz-container');
 
-        questions.forEach(q => {
+        questions.forEach((q, index) => {
             const card = document.createElement('div');
-            card.className = "bg-white p-6 rounded-2xl shadow-sm flex flex-col md:flex-row items-center justify-between gap-6 border border-slate-100 hover:border-indigo-200 transition";
+            card.className = "bg-white p-8 rounded-[2rem] shadow-sm flex flex-col md:flex-row items-center justify-between gap-8 border border-slate-100 hover:shadow-md transition-all card-enter";
+            card.style.animationDelay = `${index * 0.05}s`;
             card.innerHTML = `
-                <div class="flex-1"><p class="font-bold text-slate-700">${q.id}. ${q.text}</p></div>
-                <div class="flex gap-2 w-full md:w-auto">
-                    <button onclick="setChoice(${q.id}, 'disagree', this)" class="choice-btn flex-1 md:flex-none px-6 py-2 rounded-xl text-xs font-black uppercase tracking-widest">Disagree</button>
-                    <button onclick="setChoice(${q.id}, 'both', this)" class="choice-btn flex-1 md:flex-none px-6 py-2 rounded-xl text-xs font-black uppercase tracking-widest">Both</button>
-                    <button onclick="setChoice(${q.id}, 'agree', this)" class="choice-btn flex-1 md:flex-none px-6 py-2 rounded-xl text-xs font-black uppercase tracking-widest">Agree</button>
+                <div class="flex-1 text-center md:text-left">
+                    <span class="text-[10px] font-black text-slate-300 uppercase tracking-widest mb-2 block">Scenario ${index + 1}</span>
+                    <p class="font-bold text-slate-800 text-xl leading-tight">${q.text}</p>
+                </div>
+                <div class="flex gap-3 w-full md:w-auto">
+                    <button onclick="setChoice(${q.id}, 'disagree', this)" class="choice-btn flex-1 md:flex-none px-8 py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest">Disagree</button>
+                    <button onclick="setChoice(${q.id}, 'both', this)" class="choice-btn flex-1 md:flex-none px-8 py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest">Both</button>
+                    <button onclick="setChoice(${q.id}, 'agree', this)" class="choice-btn flex-1 md:flex-none px-8 py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest">Agree</button>
                 </div>
             `;
             container.appendChild(card);
@@ -128,46 +138,43 @@
         function setChoice(id, type, btn) {
             state[id] = type;
             const parent = btn.parentElement;
-            parent.querySelectorAll('.choice-btn').forEach(b => b.className = "choice-btn flex-1 md:flex-none px-6 py-2 rounded-xl text-xs font-black uppercase tracking-widest");
+            parent.querySelectorAll('.choice-btn').forEach(b => b.className = "choice-btn flex-1 md:flex-none px-8 py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest");
             btn.classList.add('active-' + type);
-            document.getElementById('progress-text').innerText = `${Object.keys(state).length} / 30 Completed`;
+            document.getElementById('progress-text').innerText = `${Object.keys(state).length} of 30 Scenarios Evaluated`;
         }
 
         let chart = null;
 
         function calculateResults() {
-            if (Object.keys(state).length < 30) { alert("Please complete all 30 questions."); return; }
-
-            let strategy = 0, delivery = 0, hybrid = 0;
-            Object.values(state).forEach(val => {
-                if (val === 'agree') strategy++;
-                else if (val === 'disagree') delivery++;
-                else hybrid++;
+            if (Object.keys(state).length < 30) { alert("The data set is incomplete. Please address all 30 scenarios."); return; }
+            let s = 0, d = 0, h = 0;
+            Object.values(state).forEach(v => {
+                if(v === 'agree') s++; else if(v === 'disagree') d++; else h++;
             });
 
-            document.getElementById('strat-score').innerText = strategy;
-            document.getElementById('deliv-score').innerText = delivery;
-            document.getElementById('both-score').innerText = hybrid;
+            document.getElementById('s-val').innerText = s;
+            document.getElementById('h-val').innerText = h;
+            document.getElementById('d-val').innerText = d;
 
             const title = document.getElementById('archetype-title');
             const verdict = document.getElementById('verdict-text');
             const advice = document.getElementById('career-advice');
 
-            if (hybrid >= 12 || (strategy > 10 && delivery > 10)) {
-                title.innerText = "The Operational Architect (Hybrid)";
-                verdict.innerText = "You are a rare bridge leader. You possess the ENTJ vision to plan the future but refuse to let the details slip. You translate high-level 'Why' into tactical 'How'.";
-                advice.innerText = "Focus on COO or VP Product roles. You are best suited for companies scaling rapidly where systems need to be built as the plane is flying.";
-            } else if (strategy > delivery) {
-                title.innerText = "The Strategic Architect";
-                verdict.innerText = "You belong in the boardroom. You find execution details distracting and thrive on market analysis, long-term roadmapping, and influencing direction.";
-                advice.innerText = "Focus on CSO, Director of Strategy, or M&A. Avoid roles that require daily micro-management of technical tasks.";
+            if (h >= 12 || (s > 10 && d > 10)) {
+                title.innerText = "The Operational Architect";
+                verdict.innerText = "You are a rare bridge leader. You translate 10-year visions into 10-day sprints without losing clarity. You are the 'Glue' that holds massive organizations together.";
+                advice.innerText = "You should be a COO or Chief of Staff. You excel in high-growth startups (Series B/C) where strategy and execution are equally chaotic.";
+            } else if (s > d) {
+                title.innerText = "The Pure Strategist";
+                verdict.innerText = "You belong at the 30,000-foot level. You find details distracting and excel at identifying market shifts before they happen. You win by being 'First,' not 'Fastest'.";
+                advice.innerText = "Target CSO, M&A, or Product Strategy roles. Your value is in the 'What,' not the 'How'. Avoid micro-management roles.";
             } else {
-                title.innerText = "The High-Impact General";
-                verdict.innerText = "You are a master of execution. You use your commander energy to crush bottlenecks and meet deadlines. You value results over theories.";
-                advice.innerText = "Focus on Head of Operations or Program Director. You are the person companies call when a mission-critical project must not fail.";
+                title.innerText = "The Delivery General";
+                verdict.innerText = "You are an execution specialist. You value momentum and tangible results. You use your commander traits to crush blockers and ensure the mission is accomplished.";
+                advice.innerText = "Focus on Head of Operations, Program Director, or General Manager roles. You are the finisher companies call when a project must not fail.";
             }
 
-            renderChart(strategy, hybrid, delivery);
+            renderChart(s, h, d);
             document.getElementById('result-modal').classList.remove('hidden');
         }
 
@@ -178,9 +185,9 @@
                 type: 'doughnut',
                 data: {
                     labels: ['Strategy Bias', 'Hybrid Bias', 'Delivery Bias'],
-                    datasets: [{ data: [s, h, d], backgroundColor: ['#4f46e5', '#f59e0b', '#10b981'], borderWidth: 0 }]
+                    datasets: [{ data: [s, h, d], backgroundColor: ['#4f46e5', '#f59e0b', '#10b981'], borderWidth: 0, hoverOffset: 15 }]
                 },
-                options: { cutout: '75%', plugins: { legend: { position: 'bottom' } } }
+                options: { cutout: '80%', plugins: { legend: { display: false } } }
             });
         }
 
