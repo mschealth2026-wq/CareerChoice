@@ -3,208 +3,179 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Strategy vs Delivery | ENTJ Diagnostic</title>
+    <title>ENTJ Diagnostic: Strategy vs Delivery</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        input[type=range]::-webkit-slider-thumb {
-            -webkit-appearance: none;
-            height: 24px;
-            width: 24px;
-            border-radius: 50%;
-            background: #4f46e5;
-            cursor: pointer;
-            box-shadow: 0 0 10px rgba(79, 70, 229, 0.3);
-        }
-        .gradient-text {
-            background: linear-gradient(90deg, #4f46e5, #9333ea);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
+        .choice-btn.active-strategy { background-color: #4f46e5; color: white; border-color: #4f46e5; }
+        .choice-btn.active-delivery { background-color: #10b981; color: white; border-color: #10b981; }
+        .gradient-bg { background: linear-gradient(135deg, #1e1b4b 0%, #312e81 100%); }
     </style>
 </head>
-<body class="bg-gray-50 text-gray-900 min-h-screen">
+<body class="bg-slate-50 text-slate-900 font-sans">
 
-    <div class="max-w-4xl mx-auto py-12 px-4">
-        <div class="text-center mb-16">
-            <h1 class="text-4xl font-black mb-4 gradient-text">The Commander's Choice</h1>
-            <p class="text-xl text-gray-600">Strategy Lead vs. Delivery Lead Diagnostic</p>
-            <div class="mt-4 flex justify-center gap-4 text-sm font-bold uppercase tracking-widest text-gray-400">
-                <span>1: Pure Delivery</span>
-                <span>•</span>
-                <span>3: Hybrid</span>
-                <span>•</span>
-                <span>5: Pure Strategy</span>
-            </div>
-        </div>
+    <div class="max-w-3xl mx-auto py-12 px-6">
+        <header class="text-center mb-12">
+            <h1 class="text-4xl font-black tracking-tight text-slate-900 uppercase italic">The Commander's Audit</h1>
+            <p class="text-slate-500 mt-2 font-medium">Forced-Choice: Strategy Lead vs. Delivery Lead</p>
+        </header>
 
-        <div id="quiz-container" class="space-y-10">
+        <div id="quiz-container" class="space-y-6">
             </div>
 
-        <div class="mt-20 text-center">
-            <button onclick="calculateResults()" class="bg-indigo-600 text-white px-12 py-4 rounded-xl font-black text-lg hover:bg-indigo-700 transition shadow-2xl">
-                REVEAL ARCHETYPE
+        <div class="mt-16 mb-24 text-center">
+            <button onclick="calculateBinaryResults()" class="gradient-bg text-white px-10 py-4 rounded-full font-bold text-xl shadow-xl hover:scale-105 transition-transform">
+                VIEW ARCHETYPE
             </button>
         </div>
 
-        <div id="results-area" class="hidden mt-20 p-8 bg-white rounded-3xl shadow-2xl border border-gray-100">
-            <h2 class="text-3xl font-black text-center mb-8">Your Leadership Profile</h2>
-            
-            <div class="grid md:grid-cols-2 gap-12 items-center">
-                <div>
-                    <canvas id="radarChart"></canvas>
+        <div id="result-modal" class="hidden fixed inset-0 bg-slate-900/90 backdrop-blur-md z-50 flex items-center justify-center p-4">
+            <div class="bg-white max-w-2xl w-full max-h-[90vh] overflow-y-auto rounded-3xl p-8 shadow-2xl">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-3xl font-black uppercase italic">Assessment Results</h2>
+                    <button onclick="closeModal()" class="text-slate-400 hover:text-slate-900 font-bold">CLOSE</button>
                 </div>
-                <div id="analysis-text" class="space-y-4">
+                
+                <div class="mb-8">
+                    <canvas id="resultChart" height="200"></canvas>
+                </div>
+
+                <div id="verdict-box" class="p-6 rounded-2xl border-2 border-slate-100 mb-6">
                     </div>
-            </div>
-            
-            <div class="mt-12 p-6 bg-indigo-50 rounded-2xl">
-                <h3 class="font-bold text-indigo-900 mb-2">ENTJ Pro-Tip:</h3>
-                <p id="entj-tip" class="text-indigo-800 italic"></p>
+
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="bg-indigo-50 p-4 rounded-xl text-center">
+                        <span class="block text-xs font-bold text-indigo-400 uppercase">Strategy Score</span>
+                        <span id="strat-percent" class="text-3xl font-black text-indigo-700">0%</span>
+                    </div>
+                    <div class="bg-emerald-50 p-4 rounded-xl text-center">
+                        <span class="block text-xs font-bold text-emerald-400 uppercase">Delivery Score</span>
+                        <span id="deliv-percent" class="text-3xl font-black text-emerald-700">0%</span>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 
     <script>
         const questions = [
-            // Category 1: Work Nature
-            { id: 1, cat: "Nature", text: "I prefer researching 'Why' a project matters over managing 'How' it gets done." },
-            { id: 2, cat: "Nature", text: "I get more satisfaction from a 3-year ROI than a successful weekly sprint." },
-            { id: 3, cat: "Nature", text: "I would rather design a complex system from scratch than optimize an existing one." },
-            { id: 4, cat: "Nature", text: "I prefer 'The Map' (planning) over 'The Journey' (executing)." },
-            { id: 5, cat: "Nature", text: "I am more comfortable with a 3-year time horizon than a 3-month one." },
-            { id: 6, cat: "Nature", text: "I enjoy identifying 'White Space' market opportunities over 'Blockers' in a workflow." },
-            // Category 2: Management
+            { id: 1, cat: "Nature", text: "I would rather define a new goal than build a plan for an existing one." },
+            { id: 2, cat: "Nature", text: "I prefer looking at 3-year market projections over weekly sprint reports." },
+            { id: 3, cat: "Nature", text: "I am more interested in 'Why' we are building a product than 'How' it is built." },
+            { id: 4, cat: "Nature", text: "I enjoy identifying market 'White Space' more than identifying workflow 'Blockers'." },
+            { id: 5, cat: "Nature", text: "I would rather design a complex system from scratch than optimize an old one." },
+            { id: 6, cat: "Nature", text: "I prefer 'The Map' (Strategy) over 'The Journey' (Execution)." },
             { id: 7, cat: "Accountability", text: "I want to be held accountable for Market Share rather than a Launch Date." },
-            { id: 8, cat: "Accountability", text: "I would rather manage the Board of Directors than a Technical Team." },
-            { id: 9, cat: "Accountability", text: "I prefer influence via persuasion over directing direct reports." },
-            { id: 10, cat: "Accountability", text: "I am okay with my work being 'invisible' for months if it leads to a major pivot." },
-            { id: 11, cat: "Accountability", text: "I feel successful when I’ve secured a budget, even if I don’t spend it." },
-            { id: 12, cat: "Accountability", text: "I prefer defining 'What Success Looks Like' rather than 'Making Success Happen'." },
-            // Category 3: Stress
-            { id: 13, cat: "Stress", text: "In a crisis, I instinctively re-evaluate the goal rather than increasing velocity." },
-            { id: 14, cat: "Stress", text: "I find outdated business models more frustrating than technical bottlenecks." },
-            { id: 15, cat: "Stress", text: "I prefer C-suite politics over the daily politics of team management." },
-            { id: 16, cat: "Stress", text: "I am comfortable making direction shifts with only 70% data available." },
+            { id: 8, cat: "Accountability", text: "I would rather manage the Board than a technical team." },
+            { id: 9, cat: "Accountability", text: "I prefer influence via persuasion over directing people via authority." },
+            { id: 10, cat: "Accountability", text: "I am okay with my work being 'unseen' for months if it leads to a major pivot." },
+            { id: 11, cat: "Accountability", text: "I feel more successful when I secure a budget than when I spend it." },
+            { id: 12, cat: "Accountability", text: "I prefer defining Success rather than being the one to 'Make Success Happen'." },
+            { id: 13, cat: "Stress", text: "In a crisis, my first instinct is to re-evaluate the goal, not increase speed." },
+            { id: 14, cat: "Stress", text: "An outdated business model is more frustrating than a technical bottleneck." },
+            { id: 15, cat: "Stress", text: "I prefer high-level C-suite politics over daily team-management politics." },
+            { id: 16, cat: "Stress", text: "I am comfortable making a pivot with only 70% of the data available." },
             { id: 17, cat: "Stress", text: "I'd rather tell a CEO their vision is wrong than tell a Dev their code is late." },
             { id: 18, cat: "Stress", text: "I am energized by 'Blue Ocean' ambiguity more than 'War Room' intensity." },
-            // Category 4: Dynamics
-            { id: 19, cat: "Dynamics", text: "I enjoy Resource Allocation (deciding budgets) over Resource Management (tracking spend)." },
-            { id: 20, cat: "Dynamics", text: "I prefer being the SME on the industry rather than the Process Owner for the company." },
-            { id: 21, cat: "Dynamics", text: "I want my legacy to be changing 'Where we went' rather than 'Getting us there on time'." },
-            { id: 22, cat: "Dynamics", text: "I would rather attend a Market Trend conference than an Agile workshop." },
-            { id: 23, cat: "Dynamics", text: "I find mundane tasks (admin) more draining than abstract problems." },
-            { id: 24, cat: "Dynamics", text: "I am naturally drawn to Competitive Analysis more than Internal Benchmarking." },
-            // Category 5: ENTJ Commander
-            { id: 25, cat: "Commander", text: "I use my directness to challenge assumptions rather than enforce daily standards." },
-            { id: 26, cat: "Commander", text: "I value Innovation (new things) significantly more than Efficiency (better things)." },
-            { id: 27, cat: "Commander", text: "I'd sacrifice team harmony for a Strategic Win, but not for a Project Deadline." },
-            { id: 28, cat: "Commander", text: "I prefer looking at Leading Indicators (future) over Lagging Indicators (past)." },
-            { id: 29, cat: "Commander", text: "I prefer 'Selling' a vision to stakeholders over 'Protecting' a team from them." },
-            { id: 30, cat: "Commander", text: "I'd rather be the Architect who leaves after blueprints than the Builder who stays." }
+            { id: 19, cat: "Dynamics", text: "I enjoy Resource Allocation (budgets) more than Resource Management (tracking)." },
+            { id: 20, cat: "Dynamics", text: "I prefer being a Subject Matter Expert (SME) over being a Process Owner." },
+            { id: 21, cat: "Dynamics", text: "I want my legacy to be 'They changed our direction' rather than 'They were on time'." },
+            { id: 22, cat: "Dynamics", text: "I would rather attend a Market Trend conference than an Agile/Ops workshop." },
+            { id: 23, cat: "Dynamics", text: "I find mundane status-tracking more draining than abstract problem-solving." },
+            { id: 24, cat: "Dynamics", text: "I am naturally drawn to Competitive Analysis over Internal Benchmarking." },
+            { id: 25, cat: "ENTJ", text: "I use my directness to challenge assumptions rather than to enforce standards." },
+            { id: 26, cat: "ENTJ", text: "I value Innovation (new things) significantly more than Efficiency (better things." },
+            { id: 27, cat: "ENTJ", text: "I would sacrifice team harmony for a Strategic Win, but not for a Project Deadline." },
+            { id: 28, cat: "ENTJ", text: "I prefer looking at Leading Indicators (future) over Lagging Indicators (past)." },
+            { id: 29, cat: "ENTJ", text: "I prefer 'Selling' a vision to stakeholders over 'Protecting' a team from them." },
+            { id: 30, cat: "ENTJ", text: "I’d rather be the Architect who leaves after the plans are done than the Builder." }
         ];
 
-        const quizContainer = document.getElementById('quiz-container');
+        const state = {};
 
+        const quiz = document.getElementById('quiz-container');
         questions.forEach(q => {
-            const div = document.createElement('div');
-            div.className = "bg-white p-8 rounded-2xl shadow-sm border border-gray-100";
-            div.innerHTML = `
-                <div class="flex justify-between items-center mb-6">
-                    <span class="text-xs font-black text-indigo-400 uppercase tracking-widest">${q.cat}</span>
-                    <span class="text-xs font-bold text-gray-300">#${q.id}</span>
-                </div>
-                <p class="text-lg font-bold mb-8 text-gray-800">${q.text}</p>
-                <input type="range" min="1" max="5" value="3" step="1" id="q-${q.id}" 
-                       class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer slider-thumb">
-                <div class="flex justify-between mt-4 text-xs font-bold text-gray-400 uppercase">
-                    <span>Delivery</span>
-                    <span>Neutral</span>
-                    <span>Strategy</span>
+            const card = document.createElement('div');
+            card.className = "bg-white p-6 rounded-2xl shadow-sm flex flex-col md:flex-row items-center justify-between gap-4 border border-slate-100";
+            card.innerHTML = `
+                <p class="font-bold text-slate-700 text-sm md:text-base">${q.id}. ${q.text}</p>
+                <div class="flex gap-2">
+                    <button onclick="setChoice(${q.id}, 'delivery', this)" class="choice-btn px-4 py-2 rounded-lg border-2 border-slate-200 text-xs font-black uppercase transition-all hover:bg-slate-50">Disagree</button>
+                    <button onclick="setChoice(${q.id}, 'strategy', this)" class="choice-btn px-4 py-2 rounded-lg border-2 border-slate-200 text-xs font-black uppercase transition-all hover:bg-slate-50">Agree</button>
                 </div>
             `;
-            quizContainer.appendChild(div);
+            quiz.appendChild(card);
         });
 
-        let radarChartInstance = null;
-
-        function calculateResults() {
-            const scoresByCat = { Nature: 0, Accountability: 0, Stress: 0, Dynamics: 0, Commander: 0 };
-            const countsByCat = { Nature: 6, Accountability: 6, Stress: 6, Dynamics: 6, Commander: 6 };
-            let totalStrategyScore = 0;
-
-            questions.forEach(q => {
-                const val = parseInt(document.getElementById(`q-${q.id}`).value);
-                scoresByCat[q.cat] += val;
-                totalStrategyScore += val;
-            });
-
-            // Normalize scores for the radar chart (1 to 5)
-            const chartData = Object.keys(scoresByCat).map(cat => scoresByCat[cat] / countsByCat[cat]);
-            const average = totalStrategyScore / 30;
-
-            displayResults(chartData, average);
+        function setChoice(id, type, btn) {
+            state[id] = type;
+            const parent = btn.parentElement;
+            parent.querySelectorAll('.choice-btn').forEach(b => b.className = "choice-btn px-4 py-2 rounded-lg border-2 border-slate-200 text-xs font-black uppercase transition-all hover:bg-slate-50");
+            btn.classList.add(type === 'strategy' ? 'active-strategy' : 'active-delivery');
         }
 
-        function displayResults(chartData, average) {
-            document.getElementById('results-area').classList.remove('hidden');
-            
-            const analysisText = document.getElementById('analysis-text');
-            const tipText = document.getElementById('entj-tip');
-            
-            let title, desc, tip;
+        let chartInstance = null;
 
-            if (average >= 3.8) {
-                title = "The Strategic Architect";
-                desc = "You are a high-level conceptual leader. You find execution details draining and thrive when navigating market shifts and C-suite influence.";
-                tip = "Beware of the 'Ivory Tower' effect. Your vision is only as good as the team's ability to build it. Practice delegating the 'How' while you master the 'Why'.";
-            } else if (average <= 2.2) {
-                title = "The High-Velocity General";
-                desc = "You are a results-machine. You value momentum and tangible wins. You prefer the heat of the 'War Room' to the abstraction of the boardroom.";
-                tip = "Don't let your intolerance for inefficiency burn out your team. Use your 'Commander' energy to protect your team's focus, not just demand more speed.";
-            } else {
-                title = "The Hybrid Operator";
-                desc = "You occupy the rare space between vision and execution. You can translate complex strategy into actionable steps.";
-                tip = "Your biggest challenge is being pulled in too many directions. Decide if you want to be a 'Strategic COO' or a 'Product-Focused CEO'.";
+        function calculateBinaryResults() {
+            const total = Object.keys(state).length;
+            if (total < 30) {
+                alert(`Please answer all questions. You have ${30 - total} left.`);
+                return;
             }
 
-            analysisText.innerHTML = `<h3 class="text-2xl font-black text-indigo-600">${title}</h3><p class="text-gray-600 leading-relaxed">${desc}</p>`;
-            tipText.innerText = tip;
+            let stratCount = 0;
+            let delivCount = 0;
+            const catScores = { Nature: 0, Accountability: 0, Stress: 0, Dynamics: 0, ENTJ: 0 };
 
-            // Chart implementation
-            const ctx = document.getElementById('radarChart').getContext('2d');
-            if (radarChartInstance) radarChartInstance.destroy();
-
-            radarChartInstance = new Chart(ctx, {
-                type: 'radar',
-                data: {
-                    labels: ['Nature', 'Accountability', 'Stress', 'Dynamics', 'Commander'],
-                    datasets: [{
-                        label: 'Leadership Profile (Lean toward Strategy)',
-                        data: chartData,
-                        fill: true,
-                        backgroundColor: 'rgba(79, 70, 229, 0.2)',
-                        borderColor: 'rgb(79, 70, 229)',
-                        pointBackgroundColor: 'rgb(79, 70, 229)',
-                        pointBorderColor: '#fff',
-                        pointHoverBackgroundColor: '#fff',
-                        pointHoverBorderColor: 'rgb(79, 70, 229)'
-                    }]
-                },
-                options: {
-                    scales: {
-                        r: {
-                            angleLines: { display: false },
-                            suggestedMin: 1,
-                            suggestedMax: 5,
-                            ticks: { stepSize: 1 }
-                        }
-                    }
+            questions.forEach(q => {
+                if (state[q.id] === 'strategy') {
+                    stratCount++;
+                    catScores[q.cat]++;
+                } else {
+                    delivCount++;
                 }
             });
 
-            window.scrollTo({ top: document.getElementById('results-area').offsetTop - 50, behavior: 'smooth' });
+            const stratPct = Math.round((stratCount / 30) * 100);
+            const delivPct = 100 - stratPct;
+
+            document.getElementById('strat-percent').innerText = stratPct + "%";
+            document.getElementById('deliv-percent').innerText = delivPct + "%";
+
+            const verdictBox = document.getElementById('verdict-box');
+            if (stratPct > 60) {
+                verdictBox.innerHTML = `<h4 class="font-black text-indigo-600 uppercase italic mb-2">The Strategic Architect</h4><p class="text-sm text-slate-600">Your ENTJ profile is optimized for the 'Ivory Tower.' You thrive on market shifts and high-level decision making. Mundane operational tasks will burn you out quickly.</p>`;
+            } else if (delivPct > 60) {
+                verdictBox.innerHTML = `<h4 class="font-black text-emerald-600 uppercase italic mb-2">The Executive General</h4><p class="text-sm text-slate-600">You are an execution machine. You value tangible milestones and speed. You use your commander energy to crush bottlenecks and meet deadlines.</p>`;
+            } else {
+                verdictBox.innerHTML = `<h4 class="font-black text-slate-900 uppercase italic mb-2">The Operational Link</h4><p class="text-sm text-slate-600">You are a rare hybrid. You have the vision to strategize but the discipline to ensure it's built correctly. Ideal for COO or Head of Product roles.</p>`;
+            }
+
+            renderChart(Object.values(catScores));
+            document.getElementById('result-modal').classList.remove('hidden');
         }
+
+        function renderChart(data) {
+            const ctx = document.getElementById('resultChart').getContext('2d');
+            if (chartInstance) chartInstance.destroy();
+            chartInstance = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['Nature', 'Accountability', 'Stress', 'Dynamics', 'ENTJ Traits'],
+                    datasets: [{
+                        label: 'Strategy Preference (Out of 6)',
+                        data: data,
+                        backgroundColor: '#4f46e5',
+                        borderRadius: 10
+                    }]
+                },
+                options: {
+                    scales: { y: { beginAtZero: true, max: 6 } }
+                }
+            });
+        }
+
+        function closeModal() { document.getElementById('result-modal').classList.add('hidden'); }
     </script>
 </body>
 </html>
