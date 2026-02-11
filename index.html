@@ -3,29 +3,22 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ENTJ Leadership Audit | Randomizing Engine</title>
+    <title>Jyothirmayi Audit: Strategy vs. Delivery</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         .choice-btn { border: 2px solid #e2e8f0; transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); }
-        .active-agree { background-color: #4338ca !important; color: white !important; border-color: #4338ca !important; transform: translateY(-2px); box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); }
-        .active-disagree { background-color: #059669 !important; color: white !important; border-color: #059669 !important; transform: translateY(-2px); box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); }
-        .active-both { background-color: #d97706 !important; color: white !important; border-color: #d97706 !important; transform: translateY(-2px); box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); }
-        .card-enter { animation: slideUp 0.5s ease-out forwards; opacity: 0; }
-        @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        .active-agree { background-color: #4338ca !important; color: white !important; border-color: #4338ca !important; transform: translateY(-2px); box-shadow: 0 4px 10px rgba(67, 56, 202, 0.3); }
+        .active-disagree { background-color: #059669 !important; color: white !important; border-color: #059669 !important; transform: translateY(-2px); box-shadow: 0 4px 10px rgba(5, 150, 105, 0.3); }
+        .active-both { background-color: #d97706 !important; color: white !important; border-color: #d97706 !important; transform: translateY(-2px); box-shadow: 0 4px 10px rgba(217, 119, 6, 0.3); }
     </style>
 </head>
-<body class="bg-slate-50 text-slate-900 font-sans selection:bg-indigo-100">
+<body class="bg-slate-50 text-slate-900 font-sans antialiased">
 
     <div class="max-w-4xl mx-auto py-16 px-6">
         <header class="text-center mb-12">
-            <span class="text-indigo-600 font-black tracking-widest uppercase text-xs">Advanced Management Diagnostic</span>
+            <span class="text-indigo-600 font-black tracking-widest uppercase text-xs">ISB Transition Portfolio Tool</span>
             <h1 class="text-5xl font-black uppercase italic tracking-tighter mt-2">The Commander's Audit</h1>
-            <div class="flex justify-center gap-4 mt-6">
-                <div class="h-1 w-12 bg-indigo-600 rounded-full"></div>
-                <div class="h-1 w-12 bg-amber-500 rounded-full"></div>
-                <div class="h-1 w-12 bg-emerald-500 rounded-full"></div>
-            </div>
             <p id="progress-text" class="mt-8 text-sm font-bold text-slate-400 uppercase">0 of 30 Scenarios Evaluated</p>
         </header>
 
@@ -34,7 +27,7 @@
 
         <div class="mt-20 mb-40 text-center">
             <button onclick="calculateResults()" class="bg-slate-900 text-white px-16 py-6 rounded-2xl font-black text-2xl shadow-2xl hover:bg-black transition-all hover:scale-105 active:scale-95 uppercase italic tracking-widest">
-                Finalize Profile
+                Analyze My Archetype
             </button>
         </div>
     </div>
@@ -45,31 +38,23 @@
             
             <div class="mb-12">
                 <h2 class="text-5xl font-black uppercase italic tracking-tighter leading-none" id="archetype-title">Analyzing...</h2>
-                <p class="text-indigo-600 font-bold uppercase tracking-widest mt-4">Psychometric Leadership Breakdown</p>
+                <p class="text-indigo-600 font-bold uppercase tracking-widest mt-4">Psychometric Leadership Breakdown for Jyothirmayi B.</p>
             </div>
             
             <div class="grid lg:grid-cols-2 gap-16 mb-12 items-center">
                 <div class="relative">
                     <canvas id="resultChart"></canvas>
-                    <div class="absolute inset-0 flex items-center justify-center -z-10">
-                        <div class="w-32 h-32 bg-slate-50 rounded-full"></div>
-                    </div>
                 </div>
                 <div class="space-y-6">
                     <div class="bg-slate-50 p-8 rounded-3xl border border-slate-100">
                         <h4 class="text-xs font-black text-slate-400 uppercase tracking-widest mb-4">Strategic Verdict</h4>
                         <p id="verdict-text" class="text-xl font-medium text-slate-800 leading-relaxed"></p>
                     </div>
-                    <div class="grid grid-cols-3 gap-2">
-                        <div class="text-center p-4 bg-indigo-50 rounded-2xl"><span class="block text-[10px] font-bold text-indigo-400 uppercase">Strategy</span><span id="s-val" class="text-2xl font-black text-indigo-700">0</span></div>
-                        <div class="text-center p-4 bg-amber-50 rounded-2xl"><span class="block text-[10px] font-bold text-amber-400 uppercase">Hybrid</span><span id="h-val" class="text-2xl font-black text-amber-700">0</span></div>
-                        <div class="text-center p-4 bg-emerald-50 rounded-2xl"><span class="block text-[10px] font-bold text-emerald-400 uppercase">Delivery</span><span id="d-val" class="text-2xl font-black text-emerald-700">0</span></div>
-                    </div>
                 </div>
             </div>
 
             <div class="bg-indigo-600 text-white p-10 rounded-[2rem] shadow-xl">
-                <h4 class="font-black uppercase tracking-tighter text-indigo-200 mb-4 italic text-xl">The ENTJ Roadmap</h4>
+                <h4 class="font-black uppercase tracking-tighter text-indigo-200 mb-4 italic text-xl">The ENTJ Career Roadmap</h4>
                 <p id="career-advice" class="text-lg opacity-90 leading-relaxed"></p>
             </div>
         </div>
@@ -77,39 +62,38 @@
 
     <script>
         const rawQuestions = [
-            { text: "I prefer setting the 'North Star' for a company over building the roadmap to get there." },
-            { text: "I find it more stressful to have a 'wrong' strategy than to have a 'late' delivery." },
-            { text: "I get more energy from high-level brainstorming than tactical stand-ups." },
-            { text: "I'd rather be responsible for 'Product Viability' than 'Product Stability'." },
-            { text: "I prefer managing a portfolio of 10 projects over the details of a single one." },
-            { text: "I believe 'Culture' is a more important lever for success than 'Process'." },
-            { text: "I enjoy the political work of securing buy-in more than the technical work of execution." },
-            { text: "I would rather hire a 'Visionary' who is messy than an 'Optimizer' who is rigid." },
-            { text: "I find predictability in a team slightly boring; I prefer 'Pivot-ability'." },
-            { text: "I am more interested in Industry Trends than Internal Team Velocity." },
-            { text: "I'd rather present a pitch deck to an investor than a status report to a client." },
-            { text: "I feel most useful removing 'Structural' barriers, not 'Technical' ones." },
-            { text: "I prefer to work on 'High-Risk/High-Reward' bets over safe increments." },
-            { text: "I would rather define the 'Budget Pillars' than track the 'Daily Burn Rate'." },
-            { text: "I am okay with a team being uncomfortable if it means we are innovating." },
-            { text: "I prefer to spend time with 'Thought Leaders' rather than 'Subject Matter Experts'." },
-            { text: "I would rather write a 'Vision Document' than a 'Functional Specification'." },
-            { text: "I find 'Market Saturation' more alarming than 'Team Attrition'." },
-            { text: "I get more satisfaction from 'Signing a Partner' than 'Closing a Ticket'." },
-            { text: "I prefer to delegate implementation so I can focus on implications." },
-            { text: "I value flexibility in a contract more than fixed-price certainty." },
-            { text: "I’d rather be the 'Face' of a transformation than the 'Engine' behind it." },
-            { text: "I prefer solving 'Customer Perception' issues over 'System Performance' issues." },
-            { text: "I find 'Repeating a Success' less interesting than 'Attempting a Breakthrough'." },
-            { text: "I would rather manage a team of 'Specialists' than a team of 'Generalists'." },
-            { text: "I believe my best work happens in the Boardroom, not the War Room." },
-            { text: "I’d rather lose a 'Battle' (milestone) if it helps me win the 'War' (market)." },
-            { text: "I find Standard Operating Procedures (SOPs) to be a constraint on my leadership." },
-            { text: "I prefer qualitative feedback (interviews) over quantitative data (metrics)." },
-            { text: "I would rather be the Navigator on the bridge than the Engineer in the engine room." }
+            { text: "I find more fulfillment in defining a 3-year transformation roadmap than in meeting a specific release date." },
+            { text: "I'd rather spend my time at ISB studying market disruption than advanced Agile scaling frameworks." },
+            { text: "It's more frustrating to have a team building the 'wrong' product efficiently than building the 'right' product with friction." },
+            { text: "I prefer reporting on 'Value Realization' to the CEO over reporting on 'Sprint Velocity' to the PMO." },
+            { text: "I get more energy from a high-stakes Discovery Workshop than from a technical Sprint Review." },
+            { text: "I would rather be accountable for 'Market Share' than for 'SLA Compliance'." },
+            { text: "I find it easier to delegate the 'How' (technical implementation) than the 'Why' (strategic intent)." },
+            { text: "I am more interested in Business Process Re-engineering than in Code Optimization." },
+            { text: "I would rather manage the expectations of the Board than the daily blockers of a development team." },
+            { text: "I prefer a role where I define the budget for a project rather than a role where I am told how to spend it." },
+            { text: "I get more satisfaction from a successful 'Migration Strategy' than from a successful 'Bug Triage'." },
+            { text: "I would rather be the 'Architect of Change' than the 'Guardian of the Process'." },
+            { text: "I am comfortable making a major strategic pivot with 70% of data if the market opportunity is clear." },
+            { text: "I find 'Market White Space' more exciting than 'Project Predictability'." },
+            { text: "I would rather hire a 'Visionary Specialist' who needs guidance than a 'Solid Generalist' who needs none." },
+            { text: "I prefer to work on a 50-page Business Case over a 50-item RAID log." },
+            { text: "I find 'Organizational Change Management' more rewarding than 'SDLC Optimization'." },
+            { text: "I'd rather be known as the leader who 'Transformed the Business' than the one who 'Never Missed a Deadline'." },
+            { text: "I prefer managing a portfolio of diverse initiatives over deep-diving into one large migration." },
+            { text: "I get more energy from 'Selling a Vision' to stakeholders than from 'Protecting the Team' from scope creep." },
+            { text: "I value 'Strategic Agility' (pivoting the goal) over 'Operational Agility' (pivoting the tasks)." },
+            { text: "I would rather attend a 'Corporate Strategy' summit than a 'DevOps/CI/CD' conference." },
+            { text: "I find it more rewarding to secure an enterprise partnership than to close a technical debt ticket." },
+            { text: "I prefer to act as a 'Consultant to the C-Suite' rather than a 'Manager of the Workforce'." },
+            { text: "I am okay with a project being 'Late' if it results in a more significant 'Market Breakthrough'." },
+            { text: "I would rather design a 'Fit-Gap Analysis' for a new market than a 'UAT Plan' for a new release." },
+            { text: "I find 'Competitive Intelligence' more useful than 'Internal Benchmarking'." },
+            { text: "I prefer to be the 'Navigator' on the bridge rather than the 'Chief Engineer' in the engine room." },
+            { text: "I get more satisfaction from 'Solving a Growth Problem' than from 'Solving an Efficiency Problem'." },
+            { text: "I would rather be remembered as 'Visionary' than 'Reliable'." }
         ];
 
-        // Randomization Logic
         const questions = rawQuestions
             .map((q, i) => ({ ...q, id: i }))
             .sort(() => Math.random() - 0.5);
@@ -119,8 +103,7 @@
 
         questions.forEach((q, index) => {
             const card = document.createElement('div');
-            card.className = "bg-white p-8 rounded-[2rem] shadow-sm flex flex-col md:flex-row items-center justify-between gap-8 border border-slate-100 hover:shadow-md transition-all card-enter";
-            card.style.animationDelay = `${index * 0.05}s`;
+            card.className = "bg-white p-8 rounded-[2rem] shadow-sm flex flex-col md:flex-row items-center justify-between gap-8 border border-slate-100 hover:shadow-md transition-all";
             card.innerHTML = `
                 <div class="flex-1 text-center md:text-left">
                     <span class="text-[10px] font-black text-slate-300 uppercase tracking-widest mb-2 block">Scenario ${index + 1}</span>
@@ -146,36 +129,32 @@
         let chart = null;
 
         function calculateResults() {
-            if (Object.keys(state).length < 30) { alert("The data set is incomplete. Please address all 30 scenarios."); return; }
+            if (Object.keys(state).length < 30) { alert("Please address all 30 scenarios."); return; }
             let s = 0, d = 0, h = 0;
             Object.values(state).forEach(v => {
                 if(v === 'agree') s++; else if(v === 'disagree') d++; else h++;
             });
 
-            document.getElementById('s-val').innerText = s;
-            document.getElementById('h-val').innerText = h;
-            document.getElementById('d-val').innerText = d;
-
+            document.getElementById('result-modal').classList.remove('hidden');
             const title = document.getElementById('archetype-title');
             const verdict = document.getElementById('verdict-text');
             const advice = document.getElementById('career-advice');
 
             if (h >= 12 || (s > 10 && d > 10)) {
                 title.innerText = "The Operational Architect";
-                verdict.innerText = "You are a rare bridge leader. You translate 10-year visions into 10-day sprints without losing clarity. You are the 'Glue' that holds massive organizations together.";
-                advice.innerText = "You should be a COO or Chief of Staff. You excel in high-growth startups (Series B/C) where strategy and execution are equally chaotic.";
+                verdict.innerText = "Jyothirmayi, your profile confirms you are a rare bridge leader. You translate C-suite vision into high-velocity delivery trains. You build the engine while planning the destination.";
+                advice.innerText = "Focus on Digital Transformation Lead or COO roles. Your ISB education combined with your CI/CD mastery makes you perfect for Series B/C scale-ups needing 'Chaos to Order' governance.";
             } else if (s > d) {
                 title.innerText = "The Pure Strategist";
-                verdict.innerText = "You belong at the 30,000-foot level. You find details distracting and excel at identifying market shifts before they happen. You win by being 'First,' not 'Fastest'.";
-                advice.innerText = "Target CSO, M&A, or Product Strategy roles. Your value is in the 'What,' not the 'How'. Avoid micro-management roles.";
+                verdict.innerText = "You are ready to leave the 'Firefighting' of delivery behind. You find your greatest value in market positioning, M&A strategy, and long-term corporate roadmapping.";
+                advice.innerText = "Target VP of Strategy or Head of Product Strategy. Your ISB experience is your gateway to the Boardroom. Focus on the 'What' and let others manage the 'How'.";
             } else {
-                title.innerText = "The Delivery General";
-                verdict.innerText = "You are an execution specialist. You value momentum and tangible results. You use your commander traits to crush blockers and ensure the mission is accomplished.";
-                advice.innerText = "Focus on Head of Operations, Program Director, or General Manager roles. You are the finisher companies call when a project must not fail.";
+                title.innerText = "The Transformation General";
+                verdict.innerText = "You are a master of execution. You use your Commander traits to crush bottlenecks and deliver results. You value tangible wins over boardroom theories.";
+                advice.innerText = "Focus on Head of Operations or Program Director. You are the finisher companies call when mission-critical projects must not fail under any circumstances.";
             }
 
             renderChart(s, h, d);
-            document.getElementById('result-modal').classList.remove('hidden');
         }
 
         function renderChart(s, h, d) {
@@ -185,9 +164,9 @@
                 type: 'doughnut',
                 data: {
                     labels: ['Strategy Bias', 'Hybrid Bias', 'Delivery Bias'],
-                    datasets: [{ data: [s, h, d], backgroundColor: ['#4f46e5', '#f59e0b', '#10b981'], borderWidth: 0, hoverOffset: 15 }]
+                    datasets: [{ data: [s, h, d], backgroundColor: ['#4f46e5', '#f59e0b', '#10b981'], borderWidth: 0 }]
                 },
-                options: { cutout: '80%', plugins: { legend: { display: false } } }
+                options: { cutout: '80%', plugins: { legend: { position: 'bottom' } } }
             });
         }
 
